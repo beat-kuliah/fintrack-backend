@@ -9,6 +9,16 @@ import (
 	"time"
 )
 
+type Pocket struct {
+	ID        int64          `json:"id"`
+	UserID    int64          `json:"user_id"`
+	Name      string         `json:"name"`
+	Account   sql.NullString `json:"account"`
+	Amount    string         `json:"amount"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+}
+
 type User struct {
 	ID             int64          `json:"id"`
 	Email          string         `json:"email"`
