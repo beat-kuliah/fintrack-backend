@@ -9,8 +9,8 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/golodash/galidator"
 	_ "github.com/lib/pq"
-	db "github/beat-kuliah/sippad_backend/db/sqlc"
-	"github/beat-kuliah/sippad_backend/utils"
+	db "github/beat-kuliah/fintrack_backend/db/sqlc"
+	"github/beat-kuliah/fintrack_backend/utils"
 	"net/http"
 )
 
@@ -40,7 +40,7 @@ func NewServer(envPath string) *Server {
 		panic(fmt.Sprintf("Could not load env config: %v", err))
 	}
 
-	conn, err := sql.Open(config.DBdriver, config.DB_source+config.DB_name+"?sslmode=require")
+	conn, err := sql.Open(config.DBdriver, config.DB_source+config.DB_name+"?sslmode=disable")
 	if err != nil {
 		panic(fmt.Sprintf("Could not connect to database: %v", err))
 	}

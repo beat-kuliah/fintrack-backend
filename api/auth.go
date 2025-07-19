@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
-	db "github/beat-kuliah/sippad_backend/db/sqlc"
-	"github/beat-kuliah/sippad_backend/utils"
+	db "github/beat-kuliah/fintrack_backend/db/sqlc"
+	"github/beat-kuliah/fintrack_backend/utils"
 	"net/http"
 )
 
@@ -23,7 +23,7 @@ func (a Auth) router(server *Server) {
 }
 
 type UserParams struct {
-	Username string `json:"username" binding:"required"`
+	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required"`
 }
 
@@ -42,7 +42,7 @@ func (a *Auth) register(c *gin.Context) {
 	}
 
 	args := db.CreateUserParams{
-		Username:       user.Username,
+		Email:          user.Email,
 		HashedPassword: hashedPassword,
 	}
 
@@ -50,7 +50,7 @@ func (a *Auth) register(c *gin.Context) {
 	if err != nil {
 		if pgErr, ok := err.(*pq.Error); ok {
 			if pgErr.Code == "23505" {
-				c.JSON(http.StatusBadRequest, gin.H{"error": "user already exists"})
+				c.JSON(http.StatusBadRequest, gin.H{"error": "User already exists"})
 				return
 			}
 		}
@@ -70,10 +70,10 @@ func (a Auth) login(c *gin.Context) {
 		return
 	}
 
-	dbUser, err := a.server.queries.GetUserByUsername(context.Background(), user.Username)
+	dbUser, err := a.server.queries.GetUserByUsername(context.Background(), user.Email)
 
 	if err == sql.ErrNoRows {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Incorrect username or password"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Incorrect email or password"})
 		return
 	} else if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -81,7 +81,7 @@ func (a Auth) login(c *gin.Context) {
 	}
 
 	if err := utils.VerifyPassword(user.Password, dbUser.HashedPassword); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Incorrect username or password"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Incorrect email or password"})
 		return
 	}
 

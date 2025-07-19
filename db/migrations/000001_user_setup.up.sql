@@ -1,8 +1,11 @@
 CREATE TABLE "users" (
     "id" BIGSERIAL PRIMARY KEY,
-    "username" varchar(256) UNIQUE NOT NULL,
+    "email" varchar(256) UNIQUE NOT NULL,
     "name" varchar(256) NOT NULL,
     "hashed_password" varchar(256) NOT NULL,
-    "created_at" timestamp NOT NULL DEFAULT (now()),
-    "updated_at" timestamp NOT NULL DEFAULT (now())
+    "verified" timestamptz ,
+    "token_forgot" text,
+    "onboard" bool DEFAULT (true),
+    "created_at" timestamptz NOT NULL DEFAULT (now()),
+    "updated_at" timestamptz NOT NULL DEFAULT (now())
 );

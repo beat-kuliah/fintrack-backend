@@ -3,8 +3,8 @@ package db_test
 import (
 	"context"
 	"github.com/stretchr/testify/assert"
-	db "github/beat-kuliah/sippad_backend/db/sqlc"
-	"github/beat-kuliah/sippad_backend/utils"
+	db "github/beat-kuliah/fintrack_backend/db/sqlc"
+	"github/beat-kuliah/fintrack_backend/utils"
 	"log"
 	"sync"
 	"testing"
@@ -27,7 +27,8 @@ func createRandomUser(t *testing.T) db.User {
 	}
 
 	arg := db.CreateUserParams{
-		Username:       utils.RandomUsername(),
+		Email:          utils.RandomUsername() + "@gmail.com",
+		Name:           utils.RandomUsername(),
 		HashedPassword: hashedPassword,
 	}
 
@@ -36,7 +37,7 @@ func createRandomUser(t *testing.T) db.User {
 	assert.NoError(t, err)
 	assert.NotEmpty(t, user)
 
-	assert.Equal(t, user.Username, arg.Username)
+	assert.Equal(t, user.Email, arg.Email)
 	assert.Equal(t, user.HashedPassword, arg.HashedPassword)
 	assert.WithinDuration(t, user.CreatedAt, time.Now(), 2*time.Second)
 	assert.WithinDuration(t, user.UpdatedAt, time.Now(), 2*time.Second)
@@ -49,7 +50,8 @@ func TestCreateUser(t *testing.T) {
 	user1 := createRandomUser(t)
 
 	user2, err := testQuery.CreateUser(context.Background(), db.CreateUserParams{
-		Username:       user1.Username,
+		Email:          user1.Email,
+		Name:           user1.Name,
 		HashedPassword: user1.HashedPassword,
 	})
 
@@ -78,7 +80,7 @@ func TestUpdateUser(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotEmpty(t, newUser)
 	assert.Equal(t, newUser.HashedPassword, arg.HashedPassword)
-	assert.Equal(t, user.Username, newUser.Username)
+	assert.Equal(t, user.Email, newUser.Email)
 	assert.WithinDuration(t, user.UpdatedAt, time.Now(), 2*time.Second)
 }
 
@@ -92,20 +94,20 @@ func TestGetUserById(t *testing.T) {
 	assert.NotEmpty(t, newUser)
 
 	assert.Equal(t, newUser.HashedPassword, user.HashedPassword)
-	assert.Equal(t, user.Username, newUser.Username)
+	assert.Equal(t, user.Email, newUser.Email)
 }
 
 func TestGetUserByUsername(t *testing.T) {
 	defer clean_up()
 	user := createRandomUser(t)
 
-	newUser, err := testQuery.GetUserByUsername(context.Background(), user.Username)
+	newUser, err := testQuery.GetUserByUsername(context.Background(), user.Email)
 
 	assert.NoError(t, err)
 	assert.NotEmpty(t, newUser)
 
 	assert.Equal(t, newUser.HashedPassword, user.HashedPassword)
-	assert.Equal(t, user.Username, newUser.Username)
+	assert.Equal(t, user.Email, newUser.Email)
 }
 
 func TestDeleteUser(t *testing.T) {

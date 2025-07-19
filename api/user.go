@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"github.com/gin-gonic/gin"
-	db "github/beat-kuliah/sippad_backend/db/sqlc"
-	"github/beat-kuliah/sippad_backend/utils"
+	db "github/beat-kuliah/fintrack_backend/db/sqlc"
+	"github/beat-kuliah/fintrack_backend/utils"
 	"net/http"
 	"time"
 )
@@ -96,18 +96,20 @@ func (u *User) updateName(c *gin.Context) {
 }
 
 type UserResponse struct {
-	ID        int64     `json:"id"`
-	Username  string    `json:"username"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        int64        `json:"id"`
+	Email     string       `json:"email"`
+	Name      string       `json:"name"`
+	Verified  sql.NullTime `json:"verified"`
+	CreatedAt time.Time    `json:"created_at"`
+	UpdatedAt time.Time    `json:"updated_at"`
 }
 
 func (u UserResponse) toUserResponse(user *db.User) *UserResponse {
 	return &UserResponse{
 		ID:        user.ID,
-		Username:  user.Username,
+		Email:     user.Email,
 		Name:      user.Name,
+		Verified:  user.Verified,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 	}

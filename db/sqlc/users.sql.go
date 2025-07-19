@@ -12,24 +12,29 @@ import (
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (
-                   username,
+                   email,
+                   name,
                    hashed_password
-) VALUES ($1, $2) RETURNING id, username, name, hashed_password, created_at, updated_at
+) VALUES ($1, $2, $3) RETURNING id, email, name, hashed_password, verified, token_forgot, onboard, created_at, updated_at
 `
 
 type CreateUserParams struct {
-	Username       string `json:"username"`
+	Email          string `json:"email"`
+	Name           string `json:"name"`
 	HashedPassword string `json:"hashed_password"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, createUser, arg.Username, arg.HashedPassword)
+	row := q.db.QueryRowContext(ctx, createUser, arg.Email, arg.Name, arg.HashedPassword)
 	var i User
 	err := row.Scan(
 		&i.ID,
-		&i.Username,
+		&i.Email,
 		&i.Name,
 		&i.HashedPassword,
+		&i.Verified,
+		&i.TokenForgot,
+		&i.Onboard,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -55,7 +60,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, username, name, hashed_password, created_at, updated_at FROM users WHERE id = $1
+SELECT id, email, name, hashed_password, verified, token_forgot, onboard, created_at, updated_at FROM users WHERE id = $1
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id int64) (User, error) {
@@ -63,9 +68,12 @@ func (q *Queries) GetUserByID(ctx context.Context, id int64) (User, error) {
 	var i User
 	err := row.Scan(
 		&i.ID,
-		&i.Username,
+		&i.Email,
 		&i.Name,
 		&i.HashedPassword,
+		&i.Verified,
+		&i.TokenForgot,
+		&i.Onboard,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -73,17 +81,20 @@ func (q *Queries) GetUserByID(ctx context.Context, id int64) (User, error) {
 }
 
 const getUserByUsername = `-- name: GetUserByUsername :one
-SELECT id, username, name, hashed_password, created_at, updated_at FROM users WHERE username = $1
+SELECT id, email, name, hashed_password, verified, token_forgot, onboard, created_at, updated_at FROM users WHERE email = $1
 `
 
-func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
-	row := q.db.QueryRowContext(ctx, getUserByUsername, username)
+func (q *Queries) GetUserByUsername(ctx context.Context, email string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserByUsername, email)
 	var i User
 	err := row.Scan(
 		&i.ID,
-		&i.Username,
+		&i.Email,
 		&i.Name,
 		&i.HashedPassword,
+		&i.Verified,
+		&i.TokenForgot,
+		&i.Onboard,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -91,7 +102,7 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT id, username, name, hashed_password, created_at, updated_at FROM users ORDER BY id
+SELECT id, email, name, hashed_password, verified, token_forgot, onboard, created_at, updated_at FROM users ORDER BY id
 LIMIT $1 OFFSET $2
 `
 
@@ -111,9 +122,12 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 		var i User
 		if err := rows.Scan(
 			&i.ID,
-			&i.Username,
+			&i.Email,
 			&i.Name,
 			&i.HashedPassword,
+			&i.Verified,
+			&i.TokenForgot,
+			&i.Onboard,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -132,7 +146,7 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 
 const updateName = `-- name: UpdateName :one
 UPDATE users SET name = $1, updated_at = $2
-WHERE id = $3 RETURNING id, username, name, hashed_password, created_at, updated_at
+WHERE id = $3 RETURNING id, email, name, hashed_password, verified, token_forgot, onboard, created_at, updated_at
 `
 
 type UpdateNameParams struct {
@@ -146,9 +160,12 @@ func (q *Queries) UpdateName(ctx context.Context, arg UpdateNameParams) (User, e
 	var i User
 	err := row.Scan(
 		&i.ID,
-		&i.Username,
+		&i.Email,
 		&i.Name,
 		&i.HashedPassword,
+		&i.Verified,
+		&i.TokenForgot,
+		&i.Onboard,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -157,7 +174,7 @@ func (q *Queries) UpdateName(ctx context.Context, arg UpdateNameParams) (User, e
 
 const updateUserPassword = `-- name: UpdateUserPassword :one
 UPDATE users SET hashed_password = $1, updated_at = $2
-WHERE id = $3 RETURNING id, username, name, hashed_password, created_at, updated_at
+WHERE id = $3 RETURNING id, email, name, hashed_password, verified, token_forgot, onboard, created_at, updated_at
 `
 
 type UpdateUserPasswordParams struct {
@@ -171,9 +188,12 @@ func (q *Queries) UpdateUserPassword(ctx context.Context, arg UpdateUserPassword
 	var i User
 	err := row.Scan(
 		&i.ID,
-		&i.Username,
+		&i.Email,
 		&i.Name,
 		&i.HashedPassword,
+		&i.Verified,
+		&i.TokenForgot,
+		&i.Onboard,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github/beat-kuliah/sippad_backend/api"
+	"github/beat-kuliah/fintrack_backend/api"
 )
 
 func main() {

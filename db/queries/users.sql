@@ -1,14 +1,15 @@
 -- name: CreateUser :one
 INSERT INTO users (
-                   username,
+                   email,
+                   name,
                    hashed_password
-) VALUES ($1, $2) RETURNING *;
+) VALUES ($1, $2, $3) RETURNING *;
 
 -- name: GetUserByID :one
 SELECT * FROM users WHERE id = $1;
 
 -- name: GetUserByUsername :one
-SELECT * FROM users WHERE username = $1;
+SELECT * FROM users WHERE email = $1;
 
 -- name: ListUsers :many
 SELECT * FROM users ORDER BY id

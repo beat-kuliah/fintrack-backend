@@ -18,11 +18,11 @@ db_down:
 
 m_up:
 	# run migrate up
-	migrate -path db/migrations -database "postgres://root:secret@localhost:5432/sip_pad_db?sslmode=disable" up
+	migrate -path db/migrations -database "postgres://postgres:secret@localhost:5432/fintrack?sslmode=disable" up
 
 m_down:
 	# run migrate down
-	migrate -path db/migrations -database "postgres://root:secret@localhost:5432/sip_pad_db?sslmode=disable" down
+	migrate -path db/migrations -database "postgres://postgres:secret@localhost:5432/fintrack?sslmode=disable" down
 
 m_up_prod:
 	# run migrate up
